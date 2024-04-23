@@ -1,0 +1,27 @@
+{
+  "name": "eurocamp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "jest --collectCoverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/edthomas93/eurocamp.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/edthomas93/eurocamp/issues"
+  },
+  "homepage": "https://github.com/edthomas93/eurocamp#readme",
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.12.7",
+    "ts-jest": "^29.1.2",
+    "typescript": "^5.4.5"
+  }
+}
