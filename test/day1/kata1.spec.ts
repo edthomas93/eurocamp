@@ -4,13 +4,13 @@ import path from "path";
 describe("Calibration Value Sum Calculation", () => {
   describe("Success", () => {
     test("should calculate correct sum from file with valid data for default file", () => {
-      expect(sumCalibrationValues()).toBe(54561);
+      expect(sumCalibrationValues()).toBe(54076);
     });
 
     test("should calculate correct sum from file with valid data for given file", () => {
       // values from given example
       const filePath = path.join(__dirname, "test.txt");
-      expect(sumCalibrationValues(filePath)).toBe(142);
+      expect(sumCalibrationValues(filePath)).toBe(281);
     });
   });
 
