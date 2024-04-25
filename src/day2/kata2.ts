@@ -7,6 +7,11 @@ type CubeConfiguration = {
   green: number;
 };
 
+type Game = {
+  id: number;
+  configurations: CubeConfiguration[];
+};
+
 const readGameData = (filePath: string): string => {
   try {
     return readFileSync(filePath, "utf8");
@@ -15,59 +20,45 @@ const readGameData = (filePath: string): string => {
   }
 };
 
-const isGamePossible = (
-  resultGroups: string,
-  availableCubes: CubeConfiguration
-): boolean => {
-  const resultsArray = resultGroups.split("; ");
-  const maxRequiredCubes: CubeConfiguration = { red: 0, green: 0, blue: 0 };
-
-  resultsArray.forEach((result) => {
-    const currentCounts: CubeConfiguration = { red: 0, green: 0, blue: 0 };
-    result.split(", ").forEach((part) => {
-      const [count, color] = part.split(" ");
-      currentCounts[color as keyof CubeConfiguration] += parseInt(count);
+const parseGames = (input: string): Game[] => {
+  return input.split("\n").map((line) => {
+    const [gameTitle, resultGroups] = line.split(": ");
+    const id = parseInt(gameTitle.split(" ")[1]);
+    const configurations = resultGroups.split("; ").map((result) => {
+      const configuration: CubeConfiguration = { red: 0, green: 0, blue: 0 };
+      result.split(", ").forEach((part) => {
+        const [count, color] = part.split(" ");
+        configuration[color as keyof CubeConfiguration] += parseInt(count);
+      });
+      return configuration;
     });
-
-    maxRequiredCubes.red = Math.max(maxRequiredCubes.red, currentCounts.red);
-    maxRequiredCubes.green = Math.max(
-      maxRequiredCubes.green,
-      currentCounts.green
-    );
-    maxRequiredCubes.blue = Math.max(maxRequiredCubes.blue, currentCounts.blue);
+    return { id, configurations };
   });
-
-  return (
-    maxRequiredCubes.red <= availableCubes.red &&
-    maxRequiredCubes.green <= availableCubes.green &&
-    maxRequiredCubes.blue <= availableCubes.blue
-  );
 };
 
-const parseAndValidateGames = (
-  input: string,
+const isGamePossible = (
+  gameResults: CubeConfiguration[],
   availableCubes: CubeConfiguration
-): number => {
-  const lines = input.split("\n");
-
-  let sumOfValidGameIds = 0;
-
-  lines.forEach((line) => {
-    const [gameTitle, resultGroups] = line.split(": ");
-    const gameId = parseInt(gameTitle.split(" ")[1]);
-
-    if (isGamePossible(resultGroups, availableCubes)) {
-      sumOfValidGameIds += gameId;
-    }
+): boolean => {
+  return gameResults.every((config) => {
+    return (
+      config.red <= availableCubes.red &&
+      config.green <= availableCubes.green &&
+      config.blue <= availableCubes.blue
+    );
   });
-
-  return sumOfValidGameIds;
 };
 
 export const getSumOfValidGames = (
-  cubeConfiguration: CubeConfiguration,
+  availableCubes: CubeConfiguration,
   filePath = path.join(__dirname, "day2.txt")
 ): number => {
   const gameData = readGameData(filePath);
-  return parseAndValidateGames(gameData, cubeConfiguration);
+  const games = parseGames(gameData);
+  return games.reduce((acc, game) => {
+    if (isGamePossible(game.configurations, availableCubes)) {
+      return acc + game.id;
+    }
+    return acc;
+  }, 0);
 };
