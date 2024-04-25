@@ -36,17 +36,30 @@ const parseGames = (input: string): Game[] => {
   });
 };
 
+const calculateMinimumCubes = (
+  configurations: CubeConfiguration[]
+): CubeConfiguration => {
+  return configurations.reduce(
+    (acc, config) => {
+      acc.red = Math.max(acc.red, config.red);
+      acc.green = Math.max(acc.green, config.green);
+      acc.blue = Math.max(acc.blue, config.blue);
+      return acc;
+    },
+    { red: 0, green: 0, blue: 0 }
+  );
+};
+
 const isGamePossible = (
-  gameResults: CubeConfiguration[],
+  configurations: CubeConfiguration[],
   availableCubes: CubeConfiguration
 ): boolean => {
-  return gameResults.every((config) => {
-    return (
-      config.red <= availableCubes.red &&
-      config.green <= availableCubes.green &&
-      config.blue <= availableCubes.blue
-    );
-  });
+  const minCubes = calculateMinimumCubes(configurations);
+  return (
+    minCubes.red <= availableCubes.red &&
+    minCubes.green <= availableCubes.green &&
+    minCubes.blue <= availableCubes.blue
+  );
 };
 
 export const getSumOfValidGames = (
@@ -60,5 +73,17 @@ export const getSumOfValidGames = (
       return acc + game.id;
     }
     return acc;
+  }, 0);
+};
+
+export const getPowerOfMinimumCubes = (
+  filePath = path.join(__dirname, "day2.txt")
+): number => {
+  const gameData = readGameData(filePath);
+  const games = parseGames(gameData);
+  return games.reduce((acc, game) => {
+    const minCubes = calculateMinimumCubes(game.configurations);
+    const power = minCubes.red * minCubes.green * minCubes.blue;
+    return acc + power;
   }, 0);
 };
